@@ -3,6 +3,8 @@ const ctx = canvas.getContext("2d");
 
 let width, height;
 
+const maxFPS = 60;
+
 const mouse = { x: 0, y: 0, clicked: false };
 const keys = { };
 
@@ -10,6 +12,8 @@ const events = [];
 
 let points = [];
 let currentPoint = false;
+
+let lastTime = performance.now();
 
 function init() {
   resize();
@@ -29,42 +33,78 @@ function init() {
 function loop() {
   handleInputs();
 
+  // time + pausing
+  {
+    let time = performance.now();
+    let delta = time - lastTime;
+    let fps = 1000 / delta;
+    
+    if (fps > maxFPS) return requestAnimationFrame(loop);
+    if (keys[" "]) return requestAnimationFrame(loop);
+    
+    lastTime = time;
+  }
+
   if (mouse.clicked) {
     if (!currentPoint) points.push(currentPoint = vec(mouse.x, mouse.y));
     currentPoint.x = mouse.x;
     currentPoint.y = mouse.y;
   } else currentPoint = null;
 
-  ctx.fillStyle = "black";
+  if (keys["r"]) {
+    points = [];
+    currentPoint = null;
+    mouse.clicked = false;
+  }
+
+  ctx.fillStyle = `rgba(0, 0, 0, 1)`;
   ctx.fillRect(0, 0, width, height);
 
   ctx.fillStyle = "white";
+  ctx.strokeStyle = Color.yellow;
+
   for (let i = 0; i < points.length; i++) {
     Draw.circle(points[i], 2);
-    if (i > 0) lightning(points[i - 1], points[i]);
+    if (i == 0) continue;
+
+    for (let j = 1; j < 4; j++) {
+      ctx.strokeStyle = Color.lerp(Color.white, Color.yellow, (4 - j) / 6);
+      lightning(points[i - 1], points[i], (j / 4) * 2);
+    }
+
+    ctx.globalAlpha = 1;
   }
 
   requestAnimationFrame(loop);
 }
 
-function lightning(v, w) {
-  ctx.strokeStyle = 'white';
-  ctx.lineWidth = 2;
-  lightningBranch(v, w, 6, 150);
+function lightning(v, w, width) {
+  lightningSplit(v, w, 6, 250, width);
 }
 
-function lightningBranch(v, w, branchFactor, offset) {
+function lightningSplit(v, w, branchFactor, offset, width) {
   if (branchFactor <= 0) {
-    Draw.line(v, w);
+    Draw.line(v, w, width);
     return;
   }
 
-  let mid = vec((v.x + w.x) / 2, (v.y + w.y) / 2);
-  mid.x += (Math.random() - 0.5) * offset;
-  mid.y += (Math.random() - 0.5) * offset;
+  let mid = vec((v.x + w.x) / 2, (v.y + w.y) / 2).add(Vector.random().scale(offset));
 
-  lightningBranch(v, mid, branchFactor - 1, offset / 2);
-  lightningBranch(mid, w, branchFactor - 1, offset / 2);
+  lightningSplit(v, mid, branchFactor - 1, offset / 2, width);
+  lightningSplit(mid, w, branchFactor - 1, offset / 2, width);
+
+  if (Math.random() < .4) {
+    lightningBranch(mid, Math.random() > .5 ? v : w, branchFactor + 2, offset / 3, width);
+  }
+}
+
+function lightningBranch(v, w, branchFactor, offset, width) {
+  let direction = v.sub(w).add(Vector.random().scale(offset)).norm().scale(offset);
+  let mid = v.add(direction);
+
+  Draw.line(v, mid, width);
+
+  if (branchFactor > 0) lightningBranch(mid, v, branchFactor - 1, offset / 2, width * 0.6);
 }
 
 function handleInputs() {
@@ -89,6 +129,10 @@ function resize() {
   canvas.width = width = window.innerWidth;
   canvas.height = height = window.innerHeight;
   points = points.map(p => vec(p.x * width, p.y * height));
+}
+
+function lerp(a, b, t) {
+  return a * (1 - t) + b * t;
 }
 
 init();
