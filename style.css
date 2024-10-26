@@ -1,8 +1,19 @@
 * {
-  height: 100%;
-  width: 100%;
   margin: 0;
   padding: 0;
   overflow: hidden;
+  position: absolute;
+  width: 100%;
+  height: 100%;
   background-color: black;
 }
+
+/* canvas {
+  aspect-ratio: 16 / 9;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid white;
+}
+ */
