@@ -6,7 +6,7 @@ let height = canvas.height = 1080;
 
 const maxFPS = 60;
 
-const mouse = { x: 0, y: 0, clicked: false };
+const mouse = { pos: vec(0, 0), clicked: false };
 const keys = { };
 
 const events = [];
@@ -15,8 +15,11 @@ let lastTime = performance.now();
 
 const grid = new Grid();
 const path = new Path();
+const ui = new UI();
 const enemies = [];
 const towers = [];
+
+let currentPoint = vec(0, 0);
 
 function init() {
   document.addEventListener("keydown", e => events.push({ key: e.key.toLowerCase(), type: "keydown" }));
@@ -28,12 +31,15 @@ function init() {
 
   canvas.addEventListener("click", e => {
     if (innerWidth / innerHeight != 16 / 9) {
-      canvas.requestFullscreen();
+      fullscreen(canvas);
     }
-  })
+  });
 
-  path.addPoint(vec(0, 2));
-  path.addPoint(vec(4, 2));
+  path.addPoints(vec(0, 0), currentPoint);
+
+  fullscreen(canvas);
+
+  enemies.push(new Enemy());
 
   loop();
 }
@@ -62,16 +68,20 @@ function loop() {
 
   handleInputs();
 
+  if (keys.q) location = location;
+
   // time + pausing
+  let delta, time;
   {
-    let time = performance.now();
-    let delta = time - lastTime;
+    time = performance.now();
+    delta = time - lastTime;
     let fps = 1000 / delta;
 
     if (fps > maxFPS) return requestAnimationFrame(loop);
     if (keys[" "]) return requestAnimationFrame(loop);
 
     lastTime = time;
+    delta = delta / 1000;
   }
 
   ctx.fillStyle = `rgba(0, 0, 0, 1)`;
@@ -79,6 +89,35 @@ function loop() {
 
   grid.draw();
   path.draw();
+  ui.draw();
+
+  let point = Vector.round(grid.untranslatePoint(mouse.pos));
+
+  currentPoint.set(point);
+
+  if (keys.e) {
+    path.points = [...path.points.splice(0, path.points.length - 1), point.copy(), currentPoint];
+    keys.e = false;
+  }
+
+  if (keys.f) {
+    enemies.push(new Enemy());
+    keys.f = false;
+  }
+
+  if (keys.j) {
+    enemies.push(new Enemy());
+  }
+
+  path.updatePath();
+
+  ctx.fillStyle = Color.gray4;
+  Draw.square(grid.translatePoint(point), grid.width - 20);
+
+  enemies.forEach(enemy => {
+    enemy.update(delta);
+    enemy.draw();
+  });
 
   requestAnimationFrame(loop);
 }
@@ -148,8 +187,8 @@ function handleInputs() {
     if (event.type == "keyup") keys[event.key] = false;
 
     if (event.type == "mousemove") {
-      mouse.x = event.x;
-      mouse.y = event.y;
+      mouse.pos.x = event.x;
+      mouse.pos.y = event.y;
     }
 
     if (event.type == "mousedown") mouse.clicked = true;
@@ -159,6 +198,16 @@ function handleInputs() {
 
 function lerp(a, b, t) {
   return a * (1 - t) + b * t;
+}
+
+function fullscreen(element) {
+  if(element.requestFullScreen) {
+    element.requestFullScreen();
+  } else if(element.mozRequestFullScreen) {
+    element.mozRequestFullScreen();
+  } else if(element.webkitRequestFullScreen) {
+    element.webkitRequestFullScreen();
+  }
 }
 
 init();

@@ -22,10 +22,10 @@ class Color {
   static deep_purple = Color.darker(this.purple, 0.4);
 
   static white = Color.fromHSL(0, 0, 1.0);
-  static gray1 = Color.fromHSL(0, 0, 0.2);
-  static gray2 = Color.fromHSL(0, 0, 0.4);
-  static gray3 = Color.fromHSL(0, 0, 0.6);
-  static gray4 = Color.fromHSL(0, 0, 0.8);
+  static gray1 = Color.fromHSL(0, 0, 0.8);
+  static gray2 = Color.fromHSL(0, 0, 0.6);
+  static gray3 = Color.fromHSL(0, 0, 0.4);
+  static gray4 = Color.fromHSL(0, 0, 0.2);
   static black = Color.fromHSL(0, 0, 0.0);
 
   // instance code
