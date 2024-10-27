@@ -56,14 +56,14 @@ class Grid {
       for (let y = 0; y < this.rows; y++) {
         let point = this.translatePoint(vec(x, y));
 
-        ctx.fillStyle = Color.gray3.alpha(0.5);
-        Draw.square(point, this.width - 5);
+        ctx.fillStyle = Color.white.alpha(0.5);
+        Draw.square(point, this.width - 4);
 
         ctx.fillStyle = Color.black.alpha(0.5);
-        Draw.square(point, this.width - 10);
+        Draw.square(point, this.width - 6);
 
         ctx.fillStyle = Color.black;
-        Draw.square(point, this.width - 15);
+        Draw.square(point, this.width - 8);
       }
     }
   }

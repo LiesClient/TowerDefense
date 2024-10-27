@@ -72,11 +72,18 @@ class Path {
   }
 
   draw() {
-    ctx.fillStyle = Color.deeper_green;
+    ctx.fillStyle = Color.fromHSL(120, 0.2, 0.1);
 
     for (let i = 0; i < this.screenPoints.length; i++) {
-      Draw.square(this.screenPoints[i], grid.width - 20);
+      Draw.square(this.screenPoints[i], grid.width - 14);
     }
+
+    ctx.fillStyle = Color.fromHSL(0, 0.3, 0.2);
+    Draw.square(this.screenPoints[0], grid.width - 24);
+
+    ctx.fillStyle = Color.fromHSL(60, 0.3, 0.2);
+    Draw.square(this.screenPoints[this.screenPoints.length - 1], grid.width - 24);
+
 
     // ctx.fillStyle = ctx.strokeStyle = Color.red.alpha(0.5);
     // ctx.lineWidth = 5;

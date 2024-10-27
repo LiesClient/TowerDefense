@@ -3,22 +3,29 @@ class Enemy {
   radius = 0;
   color = Color.white;
   progress = 0;
+  health = 20;
+  maxHealth = 20;
 
   constructor() {
     this.speed = 2;
-    this.radius = 4;
-    this.color = Color.neon_red;
+    this.radius = grid.width / 3;
+    this.color = Color.fromHSL(0, 0.8, 0.6);
   }
 
   update(dt) {
     this.progress += this.speed * dt;
 
-    if (this.progress > path.totalDistance) this.progress = 0;
+    if (this.progress > path.totalDistance) {
+      health -= 2;
+      this.health = 0;
+    }
   }
 
   draw() {
     ctx.fillStyle = this.color;
-    Draw.circle(grid.translatePoint(this.pos), this.radius);
+    let screenPos = grid.translatePoint(this.pos);
+    Draw.circle(screenPos, this.radius / 4);
+    Draw.progressCircle(screenPos, this.radius, this.health / this.maxHealth);
   }
 
   get pos() {

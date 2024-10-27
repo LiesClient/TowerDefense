@@ -18,7 +18,6 @@ class Draw {
   }
 
   static arrow(a = vec(), b = vec(), arrowSize) {
-
     let base = b.sub(a).norm();
     let direction = base.perp().scale(arrowSize);
     let offset = base.scale(-arrowSize).add(b);
@@ -30,5 +29,12 @@ class Draw {
     ctx.fill();
 
     Draw.line(a, offset);
+  }
+
+  static progressCircle(position = vec(), radius = 0, progress = 0) {
+    ctx.beginPath();
+    ctx.moveTo(position.x, position.y);
+    ctx.arc(position.x, position.y, radius, 0, Math.PI * 2 * progress);
+    ctx.fill();
   }
 }

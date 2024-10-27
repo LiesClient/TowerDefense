@@ -16,8 +16,12 @@ let lastTime = performance.now();
 const grid = new Grid();
 const path = new Path();
 const ui = new UI();
-const enemies = [];
 const towers = [];
+let enemies = [];
+let health = 20;
+
+let enemySpawnCooldown = 1;
+let enemySpawnCooldownReset = 1;
 
 function init() {
   document.addEventListener("keydown", e => events.push({ key: e.key.toLowerCase(), type: "keydown" }));
@@ -38,8 +42,6 @@ function init() {
   path.addPoints(vec(0, 0), vec(0, 3), vec(3, 0), vec(3, 8), vec(8, 8), vec(8, 5), vec(0, 5), vec(0, 6), vec(6, 0), vec(8, 2));
 
   fullscreen(canvas);
-
-  setInterval(() => enemies.push(new Enemy()), 1000);
 
   loop();
 }
@@ -65,6 +67,26 @@ function loop() {
 
     lastTime = performance.now();
     return requestAnimationFrame(loop);
+  }
+
+  if (health <= 0) {
+    ctx.fillStyle = Color.black;
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.textAlign = "center";
+    ctx.fillStyle = Color.white;
+
+    let scaler = Math.min(innerHeight, innerWidth) / 20;
+
+    ctx.font = `${scaler}px monospace`;
+    ctx.fillText("GAME OVER", innerWidth / 2, innerHeight / 2);
+
+    ctx.font = `${scaler / 2}px monospace`;
+    ctx.fillText("Click to restart! (aka refresh the page)", innerWidth / 2, innerHeight / 2 + scaler);
+
+    window.addEventListener("click", () => location = location);
+
+    return;
   }
 
   handleInputs();
@@ -94,6 +116,18 @@ function loop() {
 
   let point = Vector.round(grid.untranslatePoint(mouse.pos));
 
+  ctx.font = `${grid.width / 2}px monospace`;
+  ctx.fillStyle = Color.neon_red;
+  let healthPosition = grid.translatePoint(vec(-1.5, 0));
+  ctx.fillText("HP: " + health, healthPosition.x, healthPosition.y);
+
+  enemySpawnCooldown -= delta;
+  if (enemySpawnCooldown <= 0) {
+    enemySpawnCooldown = enemySpawnCooldownReset;
+    enemySpawnCooldownReset *= 0.99;
+    enemies.push(new Enemy());
+  }
+
   enemies.forEach(enemy => {
     enemy.update(delta);
     enemy.draw();
@@ -103,6 +137,8 @@ function loop() {
     tower.update(delta);
     tower.draw();
   });
+
+  enemies = enemies.filter(enemy => enemy.health > 0).sort((a, b) => a.progress - b.progress);
 
   ctx.globalAlpha = 0.5;
   let exampleTower = new Tower(point);
@@ -125,7 +161,28 @@ function loop() {
 
   mouse.clickFinality = false;
 
+  if (keys.g) applyGrayscaleFilter();
+
   requestAnimationFrame(loop);
+}
+
+
+function applyGrayscaleFilter() {
+  let imageData = ctx.getImageData(0, 0, width, height);
+
+  for (let i = 0; i < imageData.data.length; i += 4) {
+    let r = imageData.data[i];
+    let g = imageData.data[i + 1];
+    let b = imageData.data[i + 2];
+    let value = (r + g + b) / 3;
+
+    imageData.data[i] = value;
+    imageData.data[i + 1] = value;
+    imageData.data[i + 2] = value;
+  }
+
+  ctx.clearRect(0, 0, width, height);
+  ctx.putImageData(imageData, 0, 0);
 }
 
 function lightning(v, w, width) {
