@@ -1,6 +1,7 @@
 class Path {
   points = [];
   gridPoints = [];
+  screenPoints = [];
   totalDistance = 0;
 
   constructor(points = []) {
@@ -43,6 +44,9 @@ class Path {
       }
     }
 
+    grid.plotPoints(this.gridPoints);
+    this.screenPoints = this.gridPoints.map(point => grid.translatePoint(point));
+
     this.totalDistance = 0;
     for (let i = 0; i < this.gridPoints.length - 1; i++) {
       this.totalDistance += Vector.distance(this.gridPoints[i], this.gridPoints[i + 1]);
@@ -68,10 +72,18 @@ class Path {
   }
 
   draw() {
-    ctx.fillStyle = Color.deep_blue;
+    ctx.fillStyle = Color.deeper_green;
 
-    for (let i = 0; i < this.gridPoints.length; i++) {
-      Draw.square(grid.translatePoint(this.gridPoints[i]), grid.width - 20);
+    for (let i = 0; i < this.screenPoints.length; i++) {
+      Draw.square(this.screenPoints[i], grid.width - 20);
     }
+
+    // ctx.fillStyle = ctx.strokeStyle = Color.red.alpha(0.5);
+    // ctx.lineWidth = 5;
+
+    // for (let i = 0; i < this.screenPoints.length - 1; i++) {
+    //   let direction = this.screenPoints[i + 1].sub(this.screenPoints[i]).norm().scale(grid.width / 4);
+    //   Draw.arrow(this.screenPoints[i].sub(direction), this.screenPoints[i].add(direction), grid.width / 10);
+    // }
   }
 }

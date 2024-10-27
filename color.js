@@ -7,19 +7,21 @@ class Color {
   static neon_blue   = Color.fromHSL(180, 1.0, 0.5);
   static neon_purple = Color.fromHSL(270, 1.0, 0.6);
 
-  static red         = Color.darker(this.neon_red,    0.2);
+  static red         = Color.darker(this.neon_red,    0.4);
   static orange      = Color.darker(this.neon_orange, 0.2);
   static yellow      = Color.darker(this.neon_yellow, 0.2);
   static green       = Color.darker(this.neon_green,  0.2);
   static blue        = Color.darker(this.neon_blue,   0.2);
   static purple      = Color.darker(this.neon_purple, 0.2);
 
-  static deep_red    = Color.darker(this.red,    0.4);
+  static deep_red    = Color.darker(this.red,    0.6);
   static deep_orange = Color.darker(this.orange, 0.4);
   static deep_yellow = Color.darker(this.yellow, 0.4);
   static deep_green  = Color.darker(this.green,  0.4);
   static deep_blue   = Color.darker(this.blue,   0.4);
   static deep_purple = Color.darker(this.purple, 0.4);
+
+  static deeper_green  = Color.darker(this.deep_green,  0.6);
 
   static white = Color.fromHSL(0, 0, 1.0);
   static gray1 = Color.fromHSL(0, 0, 0.8);
@@ -78,6 +80,10 @@ class Color {
     let b = (color.b <= 0.03928) ? color.b / 12.92 : Math.pow((color.b + 0.055) / 1.055, 2.4);
 
     return (0.2126 * r + 0.7152 * g + 0.0722 * b) * color.a;
+  }
+
+  alpha(a) {
+    return new Color(this.r, this.g, this.b, a);
   }
 
   toString() {

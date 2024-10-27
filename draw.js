@@ -16,4 +16,19 @@ class Draw {
   static square(position = vec(), size = 0) {
     ctx.fillRect(position.x - size / 2, position.y - size / 2, size, size);
   }
+
+  static arrow(a = vec(), b = vec(), arrowSize) {
+
+    let base = b.sub(a).norm();
+    let direction = base.perp().scale(arrowSize);
+    let offset = base.scale(-arrowSize).add(b);
+
+    let points = [offset.add(direction), offset.add(direction.scale(-1)), b];
+
+    ctx.beginPath();
+    points.forEach(point => ctx.lineTo(point.x, point.y));
+    ctx.fill();
+
+    Draw.line(a, offset);
+  }
 }

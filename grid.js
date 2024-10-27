@@ -1,9 +1,14 @@
 class Grid {
-  columns = 7;
-  rows = 6;
+  columns = 9;
+  rows = 9;
+  grid = [[]];
+
+  constructor() {
+    this.grid = new Array(this.columns).fill(0).map(() => new Array(this.rows).fill(0));
+  }
 
   width = height / this.rows;
-  offset = width - this.width * (this.columns + 1);
+  offset = width - this.width * this.columns;
 
   // gridspace -> screenspace
   translatePoint(v) {
@@ -18,13 +23,44 @@ class Grid {
     return translated.scale(1 / this.width).clamp(vec(0, 0), vec(this.rows, this.columns));
   }
 
+  update() {
+    
+  }
+
+  plotPoints(inputPoints, value = 1) {
+    let points = inputPoints.flat();
+
+    for (let i = 0; i < points.length; i++) {
+      this.set(points[i], value);
+    }
+  }
+
+  plotPoint(point, value) {
+    this.set(point, value);
+  }
+
+  set(v, value) {
+    return this.grid[v.x][v.y] = value;
+  }
+
+  get(v) {
+    return this.grid[v.x][v.y];
+  }
+
+  resetGrid() {
+    this.grid = new Array(this.columns).fill(0).map(() => new Array(this.rows).fill(0));
+  }
+
   draw() {
     for (let x = 0; x < this.columns; x++) {
       for (let y = 0; y < this.rows; y++) {
         let point = this.translatePoint(vec(x, y));
 
-        ctx.fillStyle = Color.gray4;
+        ctx.fillStyle = Color.gray3.alpha(0.5);
         Draw.square(point, this.width - 5);
+
+        ctx.fillStyle = Color.black.alpha(0.5);
+        Draw.square(point, this.width - 10);
 
         ctx.fillStyle = Color.black;
         Draw.square(point, this.width - 15);

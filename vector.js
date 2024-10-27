@@ -7,6 +7,10 @@ class Vector {
     this.y = y;
   }
 
+  perp() {
+    return vec(-this.y, this.x);
+  }
+
   clamp(min, max) {
     return vec(Math.max(min.x, Math.min(max.x, this.x)), Math.max(min.y, Math.min(max.y, this.y)));
   }

@@ -6,7 +6,7 @@ let height = canvas.height = 1080;
 
 const maxFPS = 60;
 
-const mouse = { pos: vec(0, 0), clicked: false };
+const mouse = { pos: vec(0, 0), clicked: false, clickFinality: false };
 const keys = { };
 
 const events = [];
@@ -19,8 +19,6 @@ const ui = new UI();
 const enemies = [];
 const towers = [];
 
-let currentPoint = vec(0, 0);
-
 function init() {
   document.addEventListener("keydown", e => events.push({ key: e.key.toLowerCase(), type: "keydown" }));
   document.addEventListener("keyup", e => events.push({ key: e.key.toLowerCase(), type: "keyup" }));
@@ -32,14 +30,16 @@ function init() {
   canvas.addEventListener("click", e => {
     if (innerWidth / innerHeight != 16 / 9) {
       fullscreen(canvas);
+      while (events.length)
+        events.pop();
     }
   });
 
-  path.addPoints(vec(0, 0), currentPoint);
+  path.addPoints(vec(0, 0), vec(0, 3), vec(3, 0), vec(3, 8), vec(8, 8), vec(8, 5), vec(0, 5), vec(0, 6), vec(6, 0), vec(8, 2));
 
   fullscreen(canvas);
 
-  enemies.push(new Enemy());
+  setInterval(() => enemies.push(new Enemy()), 1000);
 
   loop();
 }
@@ -63,6 +63,7 @@ function loop() {
     ctx.fillText("You can also click to prompt a pop-up to fullscreen.", innerWidth / 2, innerHeight / 2 + scaler * 2);
     ctx.fillText("(Game is not playable on non 16:9 panels and some browsers)", innerWidth / 2, innerHeight / 2 + scaler * 3);
 
+    lastTime = performance.now();
     return requestAnimationFrame(loop);
   }
 
@@ -93,31 +94,36 @@ function loop() {
 
   let point = Vector.round(grid.untranslatePoint(mouse.pos));
 
-  currentPoint.set(point);
-
-  if (keys.e) {
-    path.points = [...path.points.splice(0, path.points.length - 1), point.copy(), currentPoint];
-    keys.e = false;
-  }
-
-  if (keys.f) {
-    enemies.push(new Enemy());
-    keys.f = false;
-  }
-
-  if (keys.j) {
-    enemies.push(new Enemy());
-  }
-
-  path.updatePath();
-
-  ctx.fillStyle = Color.gray4;
-  Draw.square(grid.translatePoint(point), grid.width - 20);
-
   enemies.forEach(enemy => {
     enemy.update(delta);
     enemy.draw();
   });
+
+  towers.forEach(tower => {
+    tower.update(delta);
+    tower.draw();
+  });
+
+  ctx.globalAlpha = 0.5;
+  let exampleTower = new Tower(point);
+  exampleTower.draw();
+  exampleTower.drawRange();
+  ctx.globalAlpha = 1;
+
+  ctx.fillStyle = (mouse.clicked ? Color.blue : Color.deep_blue).alpha(0.25);
+  if (grid.get(point) != 0) ctx.fillStyle = (mouse.clicked ? Color.neon_red : Color.red).alpha(0.25);
+  Draw.square(grid.translatePoint(point), grid.width - 20);
+
+  if (mouse.clickFinality) {
+    let value = grid.get(point);
+
+    if (value == 0) {
+      placeTower(point);
+      grid.plotPoint(point, 2);
+    }
+  }
+
+  mouse.clickFinality = false;
 
   requestAnimationFrame(loop);
 }
@@ -192,7 +198,10 @@ function handleInputs() {
     }
 
     if (event.type == "mousedown") mouse.clicked = true;
-    if (event.type == "mouseup") mouse.clicked = false;
+    if (event.type == "mouseup") {
+      mouse.clicked = false;
+      mouse.clickFinality = true;
+    }
   }
 }
 
