@@ -44,7 +44,7 @@ class Path {
       }
     }
 
-    grid.plotPoints(this.gridPoints);
+    grid.plotPoints(this.gridPoints, -1);
     this.screenPoints = this.gridPoints.map(point => grid.translatePoint(point));
 
     this.totalDistance = 0;

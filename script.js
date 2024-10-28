@@ -39,7 +39,7 @@ function init() {
     }
   });
 
-  path.addPoints(vec(0, 0), vec(0, 3), vec(3, 0), vec(3, 8), vec(8, 8), vec(8, 5), vec(0, 5), vec(0, 6), vec(6, 0), vec(8, 2));
+  path.addPoints(vec(0, 0), vec(0, 7), vec(7, 0), vec(7, 14), vec(0, 7), vec(0, 14), vec(5, 9), vec(5, 5), vec(13, 5));
 
   fullscreen(canvas);
 
@@ -147,15 +147,15 @@ function loop() {
   ctx.globalAlpha = 1;
 
   ctx.fillStyle = (mouse.clicked ? Color.blue : Color.deep_blue).alpha(0.25);
-  if (grid.get(point) != 0) ctx.fillStyle = (mouse.clicked ? Color.neon_red : Color.red).alpha(0.25);
+  if (grid.get(point) != null) ctx.fillStyle = (mouse.clicked ? Color.neon_red : Color.red).alpha(0.25);
   Draw.square(grid.translatePoint(point), grid.width - 20);
 
   if (mouse.clickFinality) {
     let value = grid.get(point);
 
-    if (value == 0) {
+    if (value == null) {
       placeTower(point);
-      grid.plotPoint(point, 2);
+      grid.plotPoint(point, towers.length - 1);
     }
   }
 

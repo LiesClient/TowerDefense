@@ -1,10 +1,10 @@
 class Grid {
-  columns = 9;
-  rows = 9;
+  columns = 15;
+  rows = 15;
   grid = [[]];
 
   constructor() {
-    this.grid = new Array(this.columns).fill(0).map(() => new Array(this.rows).fill(0));
+    this.grid = new Array(this.columns).fill(0).map(() => new Array(this.rows).fill(null));
   }
 
   width = height / this.rows;

@@ -24,7 +24,7 @@ class Tower {
 
     Draw.circle(screenPos, 24);
 
-    if (this.attack.duration > 0) {
+    if (this.attack.duration > 0 && this.attack.target != null) {
       ctx.strokeStyle = this.color;
       Draw.line(screenPos, grid.translatePoint(this.attack.target.pos));
     }
@@ -40,7 +40,7 @@ class Tower {
     this.attack.duration -= dt;
 
     if (this.attack.duration >= 0 && this.attack.target) {
-      if (Vector.distance(this.attack.target?.pos, this.position) > this.range) {
+      if (Vector.distance(this.attack.target?.pos, this.position) > this.range || this.attack.target == null) {
         let targetableEnemies = enemies.filter(enemy => Vector.distance(enemy.pos, this.position) < this.range);
         this.attack.target = targetableEnemies.length ? targetableEnemies[0] : null;
       }
