@@ -1,6 +1,7 @@
 class Grid {
-  columns = 15;
-  rows = 15;
+  size = 20;
+  columns = this.size;
+  rows = this.size;
   grid = [[]];
 
   constructor() {
@@ -8,18 +9,17 @@ class Grid {
   }
 
   width = height / this.rows;
-  offset = width - this.width * this.columns;
 
   // gridspace -> screenspace
   translatePoint(v) {
     let scaled = v.scale(this.width);
 
-    return scaled.add(vec(this.offset + this.width / 2, this.width / 2));
+    return scaled.add(vec(this.width / 2, this.width / 2));
   }
 
   // screenspace -> gridspace
   untranslatePoint(v) {
-    let translated = v.sub(vec(this.offset + this.width / 2, this.width / 2));
+    let translated = v.sub(vec(this.width / 2, this.width / 2));
     return translated.scale(1 / this.width).clamp(vec(0, 0), vec(this.rows, this.columns));
   }
 

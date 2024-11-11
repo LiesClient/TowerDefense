@@ -8,7 +8,7 @@ class Enemy {
 
   constructor() {
     this.speed = 2;
-    this.radius = grid.width / 3;
+    this.radius = grid.width / 4;
     this.color = Color.fromHSL(0, 0.8, 0.6);
   }
 

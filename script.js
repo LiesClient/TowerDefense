@@ -1,18 +1,18 @@
 const canvas = document.getElementById("display");
 const ctx = canvas.getContext("2d");
 
-let width = canvas.width = 1920;
-let height = canvas.height = 1080;
+let width = canvas.width = height = canvas.height = window.innerHeight;
 
 const maxFPS = 60;
 
-const mouse = { pos: vec(0, 0), clicked: false, clickFinality: false };
+const mouse = { pos: vec(0, 0), clicked: false, clickFinality: false, enabled: false };
 const keys = { };
 
 const events = [];
 
 let lastTime = performance.now();
 
+const synth = new Tone.Synth().toDestination();
 const grid = new Grid();
 const path = new Path();
 const ui = new UI();
@@ -24,52 +24,57 @@ let enemySpawnCooldown = 1;
 let enemySpawnCooldownReset = 1;
 
 function init() {
-  document.addEventListener("keydown", e => events.push({ key: e.key.toLowerCase(), type: "keydown" }));
-  document.addEventListener("keyup", e => events.push({ key: e.key.toLowerCase(), type: "keyup" }));
+  canvas.addEventListener("keydown", e => events.push({ key: e.key.toLowerCase(), type: "keydown" }));
+  canvas.addEventListener("keyup", e => events.push({ key: e.key.toLowerCase(), type: "keyup" }));
 
-  document.addEventListener("mousemove", e => events.push({ x: e.clientX, y: e.clientY, type: "mousemove" }));
-  document.addEventListener("mousedown", e => events.push({ type: "mousedown" }));
-  document.addEventListener("mouseup", e => events.push({ type: "mouseup" }));
+  canvas.addEventListener("mousemove", e => events.push({ x: e.offsetX, y: e.offsetY, type: "mousemove" }));
+  canvas.addEventListener("mousedown", e => events.push({ type: "mousedown" }));
+  canvas.addEventListener("mouseout", e => events.push({ type: "mouseout" }));
+  canvas.addEventListener("mouseup", e => events.push({ type: "mouseup" }));
 
-  canvas.addEventListener("click", e => {
-    if (innerWidth / innerHeight != 16 / 9) {
-      fullscreen(canvas);
-      while (events.length)
-        events.pop();
-    }
-  });
+  // canvas.addEventListener("click", e => {
+  //   if (innerWidth / innerHeight != 16 / 9) {
+  //     fullscreen(canvas);
+  //     while (events.length)
+  //       events.pop();
+  //   }
+  // });
 
-  path.addPoints(vec(0, 0), vec(0, 7), vec(7, 0), vec(7, 14), vec(0, 7), vec(0, 14), vec(5, 9), vec(5, 5), vec(13, 5));
+  // path.addPoints(vec(0, 0), vec(0, 7), vec(7, 0), vec(7, 14), vec(0, 7), vec(0, 14), vec(5, 9), vec(5, 5), vec(13, 5));
 
+  path.addPoints(vec(0, 0), vec(4, 4));
   fullscreen(canvas);
 
   loop();
 }
 
 function loop() {
-  // check if the window is the right aspect ratio
-  if (innerWidth / innerHeight != 16 / 9) {
-    ctx.fillStyle = Color.black;
-    ctx.fillRect(0, 0, width, height);
+  // // check if the window is the right aspect ratio
+  // if (innerWidth / innerHeight != 16 / 9) {
+  //   ctx.fillStyle = Color.black;
+  //   ctx.fillRect(0, 0, width, height);
 
-    ctx.textAlign = "center";
-    ctx.fillStyle = Color.white;
+  //   ctx.textAlign = "center";
+  //   ctx.fillStyle = Color.white;
 
-    let scaler = Math.min(innerHeight, innerWidth) / 20;
+  //   let scaler = Math.min(innerHeight, innerWidth) / 20;
 
-    ctx.font = `${scaler}px monospace`;
-    ctx.fillText("Game is paused. Your aspect ratio is incorrect.", innerWidth / 2, innerHeight / 2);
+  //   ctx.font = `${scaler}px monospace`;
+  //   ctx.fillText("Game is paused. Your aspect ratio is incorrect.", innerWidth / 2, innerHeight / 2);
 
-    ctx.font = `${scaler / 2}px monospace`;
-    ctx.fillText("Note: Generally, you can fix this by pressing F11 to fullscreen.", innerWidth / 2, innerHeight / 2 + scaler);
-    ctx.fillText("You can also click to prompt a pop-up to fullscreen.", innerWidth / 2, innerHeight / 2 + scaler * 2);
-    ctx.fillText("(Game is not playable on non 16:9 panels and some browsers)", innerWidth / 2, innerHeight / 2 + scaler * 3);
+  //   ctx.font = `${scaler / 2}px monospace`;
+  //   ctx.fillText("Note: Generally, you can fix this by pressing F11 to fullscreen.", innerWidth / 2, innerHeight / 2 + scaler);
+  //   ctx.fillText("You can also click to prompt a pop-up to fullscreen.", innerWidth / 2, innerHeight / 2 + scaler * 2);
+  //   ctx.fillText("(Game is not playable on non 16:9 panels and some browsers)", innerWidth / 2, innerHeight / 2 + scaler * 3);
 
-    lastTime = performance.now();
-    return requestAnimationFrame(loop);
-  }
+  //   lastTime = performance.now();
+  //   return requestAnimationFrame(loop);
+  // }
 
   if (health <= 0) {
+    canvas.style.aspectRatio = "";
+    canvas.width = window.innerWidth;
+    canvas.style.width = "100%";
     ctx.fillStyle = Color.black;
     ctx.fillRect(0, 0, width, height);
 
@@ -82,7 +87,7 @@ function loop() {
     ctx.fillText("GAME OVER", innerWidth / 2, innerHeight / 2);
 
     ctx.font = `${scaler / 2}px monospace`;
-    ctx.fillText("Click to restart! (aka refresh the page)", innerWidth / 2, innerHeight / 2 + scaler);
+    ctx.fillText("Click to restart! (or refresh the page)", innerWidth / 2, innerHeight / 2 + scaler);
 
     window.addEventListener("click", () => location = location);
 
@@ -124,7 +129,7 @@ function loop() {
   enemySpawnCooldown -= delta;
   if (enemySpawnCooldown <= 0) {
     enemySpawnCooldown = enemySpawnCooldownReset;
-    enemySpawnCooldownReset *= 0.99;
+    enemySpawnCooldownReset = enemySpawnCooldownReset - 0.001;
     enemies.push(new Enemy());
   }
 
@@ -140,17 +145,20 @@ function loop() {
 
   enemies = enemies.filter(enemy => enemy.health > 0).sort((a, b) => a.progress - b.progress);
 
-  ctx.globalAlpha = 0.5;
-  let exampleTower = new Tower(point);
-  exampleTower.draw();
-  exampleTower.drawRange();
-  ctx.globalAlpha = 1;
 
-  ctx.fillStyle = (mouse.clicked ? Color.blue : Color.deep_blue).alpha(0.25);
-  if (grid.get(point) != null) ctx.fillStyle = (mouse.clicked ? Color.neon_red : Color.red).alpha(0.25);
-  Draw.square(grid.translatePoint(point), grid.width - 20);
+  if (mouse.enabled) {
+    ctx.globalAlpha = 0.5;
+    let exampleTower = new Tesla(point);
+    exampleTower.draw();
+    exampleTower.drawRange();
+    ctx.globalAlpha = 1;
 
-  if (mouse.clickFinality) {
+    ctx.fillStyle = (mouse.clicked ? Color.blue : Color.deep_blue).alpha(0.25);
+    if (grid.get(point) != null) ctx.fillStyle = (mouse.clicked ? Color.neon_red : Color.red).alpha(0.25);
+    Draw.square(grid.translatePoint(point), grid.width);
+  }
+
+  if (mouse.clickFinality && mouse.enabled) {
     let value = grid.get(point);
 
     if (value == null) {
@@ -185,8 +193,8 @@ function applyGrayscaleFilter() {
   ctx.putImageData(imageData, 0, 0);
 }
 
-function lightning(v, w, width) {
-  lightningSplit(v, w, 6, 250, width, 0.5);
+function lightning(v, w, offset, width) {
+  lightningSplit(v, w, 6, offset, width, 0.5);
 }
 
 function lightningSplit(v, w, branchFactor, offset, width, side) {
@@ -246,19 +254,19 @@ function handleInputs() {
   while (events.length) {
     let event = events.pop();
 
-    if (event.type == "keydown") keys[event.key] = true;
-    if (event.type == "keyup") keys[event.key] = false;
+    if (event.type == "mousedown") mouse.clicked = true;
+    if (event.type == "mouseup") mouse.clicked = !(mouse.clickFinality = true);
+
+    if (event.type == "mouseout") mouse.enabled = false;
+    else if (event.type.startsWith("mouse")) mouse.enabled = true;
 
     if (event.type == "mousemove") {
       mouse.pos.x = event.x;
       mouse.pos.y = event.y;
     }
 
-    if (event.type == "mousedown") mouse.clicked = true;
-    if (event.type == "mouseup") {
-      mouse.clicked = false;
-      mouse.clickFinality = true;
-    }
+    if (event.type == "keydown") keys[event.key] = true;
+    if (event.type == "keyup") keys[event.key] = false;
   }
 }
 

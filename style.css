@@ -1,4 +1,4 @@
-* {
+html, body {
   margin: 0;
   padding: 0;
   overflow: hidden;
@@ -8,12 +8,68 @@
   background-color: black;
 }
 
-/* canvas {
-  aspect-ratio: 16 / 9;
+#display {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: 0%;
+  right: 0%;
+  height: 100%;
+  background-color: black;
+}
+
+#root {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  height: 100%;
+  background-color: gray;
+}
+
+#tower_container {
+  height: calc(100% - 40px);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 equal-width columns */
+  gap: 20px; /* Space between items */
+  padding: 20px;
+
+  overflow: auto;
+}
+
+.tower {
+  width: calc(100% - 40px);
+  background-color: #8a8a8a;
+  border: 1px solid #ccc;
+  text-align: center;
+}
+
+.tower_display {
+  width: calc(100%);
+  aspect-ratio: 1 / 1;
   border: 1px solid white;
 }
- */
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

@@ -6,9 +6,55 @@
 </head>
 
 <body>
+  <!-- UI -->
+  <div id="root">
+    <div id="tower_container">
+      <div class="tower">
+        <canvas class="tower_display"></canvas>
+        <p class="tower_name">Tesla</p>
+        <p class="tower_cost">$400</p>
+        <p class="tower_dps">8 damage</p>
+        <p class="tower_dps">0.5 rounds / second</p>
+        <p class="tower_range">4 units</p>
+      </div>
+
+      <div class="tower">
+        <canvas class="tower_display"></canvas>
+        <p class="tower_name">Sniper</p>
+        <p class="tower_cost">$800</p>
+        <p class="tower_dps">24 damage</p>
+        <p class="tower_dps">0.1 rounds / second</p>
+        <p class="tower_range">20 units</p>
+      </div>
+
+      <div class="tower">
+        <canvas class="tower_display"></canvas>
+        <p class="tower_name">Tesla</p>
+        <p class="tower_cost">$400</p>
+        <p class="tower_dps">8 damage</p>
+        <p class="tower_dps">0.5 rounds / second</p>
+        <p class="tower_range">4 units</p>
+      </div>
+
+      <div class="tower">
+        <canvas class="tower_display"></canvas>
+        <p class="tower_name">Sniper</p>
+        <p class="tower_cost">$800</p>
+        <p class="tower_dps">24 damage</p>
+        <p class="tower_dps">0.1 rounds / second</p>
+        <p class="tower_range">20 units</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Game Display -->
   <canvas id="display"></canvas>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/tone"></script>
   <script src="vector.js"></script>
   <script src="color.js"></script>
+  <script src="rectangle.js"></script>
   <script src="draw.js"></script>
   <script src="grid.js"></script>
   <script src="path.js"></script>

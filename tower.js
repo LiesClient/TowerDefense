@@ -2,11 +2,15 @@ class Tower {
   cost = 2;
   range = 2;
   firerate = 0.8;
-  cooldown = 1;
+  cooldown = 0;
   damage = 7;
   position = vec();
   color = Color.fromHSL(240, 1.0, 0.8);
   attackDuration = 0.5;
+
+  get dps() {
+    return this.damage * this.firerate;
+  }
 
   attack = {
     duration: 0,
@@ -20,14 +24,16 @@ class Tower {
   draw() {
     ctx.fillStyle = this.color;
 
-    let screenPos = grid.translatePoint(this.position);
+    Draw.circle(grid.translatePoint(this.position), 24);
 
-    Draw.circle(screenPos, 24);
-
-    if (this.attack.duration > 0 && this.attack.target != null) {
+    if (this.attack.duration > 0 && this.attack.target != null && this.attack.target.health > 0) {
       ctx.strokeStyle = this.color;
-      Draw.line(screenPos, grid.translatePoint(this.attack.target.pos));
+      this.drawAttack(grid.translatePoint(this.attack.target.pos));
     }
+  }
+
+  drawAttack(target) {
+      Draw.line(grid.translatePoint(this.position), target);
   }
 
   drawRange() {
@@ -59,10 +65,45 @@ class Tower {
 
       this.attack.duration = this.attackDuration;
       this.attack.target = target;
+
+      synth.triggerAttackRelease("C4", this.attackDuration);
     }
   }
 }
 
+class Tesla extends Tower {
+  cost = 2;
+  range = 4;
+  firerate = 0.5;
+  cooldown = 0;
+  damage = 8;
+  color = Color.fromHSL(60, 1.0, 0.8);
+  attackDuration = 0.5;
+
+  constructor(position) {
+    super(position);
+  }
+
+  draw() {
+    ctx.fillStyle = this.color;
+
+    let screenPos = grid.translatePoint(this.position);
+
+    Draw.circle(screenPos, grid.width / 3);
+
+    if (this.attack.duration > 0 && this.attack.target != null) {
+      ctx.strokeStyle = this.color;
+      let targetPosition = grid.translatePoint(this.attack.target.pos);
+      lightning(screenPos, targetPosition, Vector.distance(screenPos, targetPosition) / 6, 2);
+    }
+  }
+
+  drawRange() {
+    ctx.fillStyle = Color.darker(this.color, 0.8);
+    Draw.circle(grid.translatePoint(this.position), this.range * grid.width);
+  }
+}
+
 function placeTower(position) {
-  towers.push(new Tower(position));
+  towers.push(new Tesla(position));
 }
