@@ -45,6 +45,9 @@ class Tower {
     this.cooldown -= dt;
     this.attack.duration -= dt;
 
+    if (this.attack?.target?.health < 0)
+      this.attack.target = null;
+
     if (this.attack.duration >= 0 && this.attack.target) {
       if (Vector.distance(this.attack.target?.pos, this.position) > this.range || this.attack.target == null) {
         let targetableEnemies = enemies.filter(enemy => Vector.distance(enemy.pos, this.position) < this.range);

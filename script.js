@@ -210,7 +210,7 @@ function lightningSplit(v, w, branchFactor, offset, width, side) {
   lightningSplit(mid, w, branchFactor - 1, offset / 2, width, 1 - side / 2);
 
   if (Math.random() < .4) {
-    lightningBranch(mid, Math.random() > .5 ? v : w, branchFactor + 2, offset / 2, width, side);
+    lightningBranch(mid, Math.random() > .5 ? v : w, branchFactor + 2, offset / 1.5, width, side);
   }
 }
 
@@ -221,7 +221,7 @@ function lightningBranch(v, w, branchFactor, offset, width, side) {
   ctx.strokeStyle = Color.lerp(Color.white, Color.yellow, side / 2);
   Draw.line(v, mid, width);
 
-  if (branchFactor > 0) lightningBranch(mid, v, branchFactor - 1, offset / 2, width * 0.6, side);
+  if (branchFactor > 0) lightningBranch(mid, v, branchFactor - 1, offset / 1.5, width * 0.6, side);
 }
 
 function renderColors() {
