@@ -1,4 +1,5 @@
-html {
+html,
+body {
   margin: 0;
   padding: 0;
   overflow: hidden;
@@ -6,10 +7,6 @@ html {
   width: 100%;
   height: 100%;
   background-color: black;
-}
-
-body {
-  display: flexbox;
 }
 
 #display {
@@ -32,44 +29,111 @@ body {
   top: 0%;
   left: 0%;
   height: 100%;
+  width: calc(100% - 100vh);
   background-color: gray;
 }
 
 #tower_container {
   height: 100%;
-  display: flexbox;
-  flex-direction: row;
+  width: calc(100% / 3);
+  min-width: 10vw;
   overflow: auto;
+
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 
 .tower {
-  display: inline;
+  width: 90%;
+  margin: 5%;
+  display: flex;
   background-color: #8a8a8a;
-  border: 1px solid #ccc;
   text-align: center;
-}
-
-.tower_display {
-  width: calc(100%);
   aspect-ratio: 1 / 1;
+  position: static;
+  border: 1px solid white;
+  font-family: monospace;
+
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-/* width */
+.tower_selected {
+  border: 1px solid blue;
+}
+
+.tower_name {
+  display: inline-block;
+  margin: 1em;
+  padding: 0;
+
+  /* height: calc(100% - (2.5em + 2rem)); */
+}
+
+.tower_details {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  margin: 1em;
+}
+
+.tower_details>p {
+  display: inline-block;
+  width: 50%;
+  margin: 0;
+  padding: 0;
+}
+
+.tower_cost:after {
+  content: "Tower cost.";
+}
+
+.tower_damage:after {
+  content: "Tower damage (per hit).";
+}
+
+.tower_firerate:after {
+  content: "Tower rate of fire.";
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.tooltip:after {
+  content: "uhh you're not supposed to see this";
+  position: absolute;
+  top: -30px;
+  right: 0;
+  left: 0;
+  display: none;
+  text-align: center;
+  background-color: #000;
+  color: #fff;
+  border-radius: 4px;
+  padding: 2px;
+}
+
+.tooltip:hover:after {
+  display: block;
+}
+
 ::-webkit-scrollbar {
   width: 10px;
 }
 
-/* Track */
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #3a3a3a;
 }
 
-/* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #888;
+  background: #4f4f4f;
 }
 
-/* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }

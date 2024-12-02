@@ -148,7 +148,7 @@ function loop() {
 
   if (mouse.enabled) {
     ctx.globalAlpha = 0.5;
-    let exampleTower = new Tesla(point);
+    let exampleTower = new Sniper(point);
     exampleTower.draw();
     exampleTower.drawRange();
     ctx.globalAlpha = 1;
@@ -171,7 +171,7 @@ function loop() {
 
   if (keys.g) applyGrayscaleFilter();
 
-  requestAnimationFrame(loop);
+  // requestAnimationFrame(loop);
 }
 
 

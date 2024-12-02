@@ -1,3 +1,5 @@
+const ALL_TOWERS = [];
+
 class Tower {
   cost = 2;
   range = 2;
@@ -17,7 +19,7 @@ class Tower {
     position: vec(0, 0),
   }
 
-  constructor(position) {
+  constructor(position = vec()) {
     this.position = position;
   }
 
@@ -33,7 +35,7 @@ class Tower {
   }
 
   drawAttack(target) {
-      Draw.line(grid.translatePoint(this.position), target);
+    Draw.line(grid.translatePoint(this.position), target);
   }
 
   drawRange() {
@@ -83,7 +85,7 @@ class Tesla extends Tower {
   color = Color.fromHSL(60, 1.0, 0.8);
   attackDuration = 0.5;
 
-  constructor(position) {
+  constructor(position = vec()) {
     super(position);
   }
 
@@ -107,6 +109,45 @@ class Tesla extends Tower {
   }
 }
 
+ALL_TOWERS.push(Tesla);
+ALL_TOWERS.push(Tesla);
+ALL_TOWERS.push(Tesla);
+
+class Sniper extends Tower {
+  cost = 8;
+  range = 12;
+  firerate = 0.2;
+  cooldown = 0;
+  damage = 16;
+  color = Color.fromHSL(180, 1.0, 0.8);
+  attackDuration = 0.2;
+
+  constructor(position = vec()) {
+    super(position);
+  }
+
+  draw() {
+    ctx.fillStyle = this.color;
+
+    let screenPos = grid.translatePoint(this.position);
+
+    Draw.circle(screenPos, grid.width / 3);
+
+    if (this.attack.duration > 0 && this.attack.target != null) {
+      ctx.strokeStyle = this.color;
+      let targetPosition = grid.translatePoint(this.attack.target.pos);
+      Draw.line(screenPos, targetPosition);
+    }
+  }
+
+  drawRange() {
+    ctx.fillStyle = Color.darker(this.color, 0.8);
+    Draw.circle(grid.translatePoint(this.position), this.range * grid.width);
+  }
+}
+
+ALL_TOWERS.push(Sniper);
+
 function placeTower(position) {
-  towers.push(new Tesla(position));
+  towers.push(new Sniper(position));
 }
